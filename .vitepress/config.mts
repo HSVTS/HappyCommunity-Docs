@@ -8,6 +8,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      { text: '指南', link: '/Guide/getting-started' },
       { text: '技术实现介绍', link: '/Technology/' },
       { text: 'API文档', link: '/API/' },
       { text: '常见问题', link: '/FAQ' }
@@ -30,6 +31,15 @@ export default defineConfig({
             { text: "首页", link: "/Technology/" },
             { text: "支付网关技术实现", link:"/Technology/Payment" },
             { text: "数据库结构说明", link:"/Technology/Database" }
+        ],
+        },
+      ],
+      "/Guide/": [
+        {
+          text: "指南",
+          items: [
+            { text: "快速开始", link: "/Guide/getting-started" },
+            { text: "配置说明", link:"/Guide/config" }
         ],
         },
       ],

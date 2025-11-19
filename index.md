@@ -8,8 +8,8 @@ hero:
   tagline: 一个基于Python Flask的智能小区管理系统后端API服务，提供完整的社区管理功能。
   actions:
     - theme: brand
-      text: 技术实现介绍
-      link: /Technology/
+      text: 快速开始
+      link: /Guide/getting-started
     - theme: alt
       text: API 文档
       link: /API/
