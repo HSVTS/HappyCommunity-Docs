@@ -37,6 +37,10 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/HSVTS/HappyCommunity-Backend' }
-    ]
+    ],
+
+    search: {
+      provider: "local",
+    },
   }
 })

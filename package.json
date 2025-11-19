@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "algolia": "^0.0.0",
     "mermaid": "^11.12.1",
     "vitepress": "^2.0.0-alpha.13"
   },
