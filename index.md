@@ -5,14 +5,14 @@ layout: home
 hero:
   name: "HappyCommunity Backend Docs"
   text: "“幸福小区”后端文档"
-  tagline: My great project tagline
+  tagline: 一个基于Python Flask的智能小区管理系统后端API服务，提供完整的社区管理功能。
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: 技术实现介绍
+      link: /Technology/
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: API 文档
+      link: /API/
 
 features:
   - title: Feature A
