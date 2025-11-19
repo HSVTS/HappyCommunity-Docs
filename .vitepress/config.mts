@@ -42,5 +42,10 @@ export default defineConfig({
     search: {
       provider: "local",
     },
+
+    footer: {
+      message: 'A project of Heshan Vocational Technical School',
+      copyright: 'Copyright © 2025 Heshan Vocational Technical School'
+    },
   }
 })
