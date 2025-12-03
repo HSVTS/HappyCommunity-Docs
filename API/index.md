@@ -546,14 +546,15 @@ Authorization: Bearer {token}
 Content-Type: application/json
 ```
 
+**必填字段**：`type`、`title`、`content`
+
+请求示例：
+
 ```json
 {
   "type": "second_hand",
   "title": "转让二手自行车",
-  "content": "九成新山地自行车，买来没怎么骑...",
-  "contact_phone": "13800138000",
-  "price": 200.00,
-  "location": "1栋2单元"
+  "content": "九成新山地自行车，买来没怎么骑..."
 }
 ```
 
