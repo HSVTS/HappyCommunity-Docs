@@ -95,27 +95,22 @@ Content-Type: application/json
   "old_password": "oldPassword123",
   "new_password": "newPassword123"
 }
+
+**默认物业账号**
+
+- 系统在首次创建数据库表时会自动创建一个默认的物业端账号：`phone=admin`，`password=admin`。
+- 建议上线环境通过环境变量或迁移脚本修改默认凭据并尽快更改默认密码以保证安全。
 ```
 
 ---
 
 ## 👤 用户管理
 
-### 1. 用户注册
+### 1. 用户注册（已禁用）
 
-```http
-POST /users/register
-Content-Type: application/json
-```
+系统已禁用用户自助注册接口。所有业主账号应由物业端或管理员通过受权限保护的接口创建。
 
-```json
-{
-  "phone": "13800138000",
-  "password": "password123",
-  "real_name": "张三",
-  "id_card": "110101199001011234"
-}
-```
+如需创建业主账号，请使用 `POST /owners`（见业主管理节）由拥有 `property` 或 `admin` 角色的账号发起。
 
 ### 2. 更新用户信息
 
@@ -166,6 +161,78 @@ Content-Type: application/json
   "room": "301",
   "area": 89.5,
   "owner_type": "owner"
+}
+```
+
+权限说明：
+
+- `building`、`unit`、`room`、`community_name`、`owner_type` 这类地址/房间相关字段 **仅允许** 具有 `property` 或 `admin` 角色的账号修改（即物业端或管理员）。
+- 业主本人仅允许修改非受限字段，例如 `area`（面积）和 `move_in_date`（入住日期）。
+- 如果业主尝试修改受限字段，接口会返回 HTTP 403（权限不足）。
+
+示例：物业端修改地址信息
+
+```http
+PUT /owners/123
+Authorization: Bearer {property_token}
+Content-Type: application/json
+```
+
+```json
+{
+  "building": "2",
+  "unit": "1",
+  "room": "201"
+}
+```
+
+示例：业主修改非受限字段
+
+```http
+PUT /owners/123
+Authorization: Bearer {owner_token}
+Content-Type: application/json
+```
+
+```json
+{
+  "area": 95.0,
+  "move_in_date": "2024-05-01"
+}
+```
+
+### 2.1 创建业主账号（物业/管理员）
+
+```http
+POST /owners
+Authorization: Bearer {token}  // 需要 property 或 admin 角色
+Content-Type: application/json
+```
+
+请求示例：
+
+```json
+{
+  "phone": "13800138001",
+  "password": "InitialPass123",
+  "real_name": "李四",
+  "id_card": "110101199001019999",
+  "building": "1",
+  "unit": "2",
+  "room": "101"
+}
+```
+
+成功响应（HTTP 200）：
+
+```json
+{
+  "code": 200,
+  "message": "创建业主账号成功",
+  "data": {
+    "user": { /* user.to_dict() */ },
+    "owner": { /* owner.to_dict() */ }
+  }
 }
 ```
 
