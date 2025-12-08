@@ -256,6 +256,49 @@ Authorization: Bearer {token}
 Query: page=1&page_size=20&building=1&status=1
 ```
 
+**响应示例**
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "user_id": 10,
+        "real_name": "张三",
+        "community_name": "幸福小区",
+        "building": "1",
+        "unit": "1",
+        "room": "101",
+        "area": 85.5,
+        "owner_type": "owner",
+        "move_in_date": null,
+        "status": 1
+      },
+      {
+        "id": 2,
+        "user_id": 11,
+        "real_name": "李四",
+        "community_name": "幸福小区",
+        "building": "1",
+        "unit": "2",
+        "room": "201",
+        "area": 95.0,
+        "owner_type": "owner",
+        "move_in_date": null,
+        "status": 1
+      }
+    ],
+    "total": 2,
+    "page": 1,
+    "page_size": 20,
+    "pages": 1
+  }
+}
+```
+
 ---
 
 ## 📢 公告管理
