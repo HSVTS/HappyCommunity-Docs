@@ -967,6 +967,39 @@ Content-Type: application/json
 }
 ```
 
+#### 修改 `property` 账号密码（由物业操作）
+
+```http
+PUT /system/users/{id}/password
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+请求示例：
+
+```json
+{
+  "old_password": "当前密码123",
+  "new_password": "NewPass456"
+}
+```
+
+说明：
+- 该接口仅允许拥有 `property` 角色的账号调用（即物业端）。
+- `id` 是目标用户的用户ID，且目标用户 **必须** 是 `property` 角色，否则接口会返回 400。
+- 接口只验证提供的 `old_password`（目标账号的当前密码），验证通过后更新为 `new_password`。
+
+成功响应示例：
+
+```json
+{
+  "code": 200,
+  "message": "密码已更新",
+  "data": null
+}
+```
+
+
 ---
 
 ## 📝 API使用示例
