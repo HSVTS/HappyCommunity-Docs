@@ -20,7 +20,7 @@
 }
 ```
 
-**通用错误码**
+`building`、`unit`、`room`、`community_name`、`owner_type` 这类地址/房间相关字段 **仅允许** 具有 `property` 角色的账号修改（即物业端）。
 
 - `200`: 成功
 - `400`: 请求参数错误
@@ -101,6 +101,9 @@ Content-Type: application/json
 - 系统在首次创建数据库表时会自动创建一个默认的物业端账号：`phone=admin`，`password=admin`。
 - 建议上线环境通过环境变量或迁移脚本修改默认凭据并尽快更改默认密码以保证安全。
 
+> 注意：项目已移除 `admin` 角色，所有原属于 `admin` 的权限已并入 `property` 角色。
+> 默认账号 `phone=admin` 的角色现在为 `property`（请在上线后尽快修改默认凭据）。
+
 **示例业主账号（用于测试）**
 
 系统初始化时自动创建 3 个示例业主账号，便于测试 API 功能：
@@ -120,9 +123,9 @@ Content-Type: application/json
 
 ### 1. 用户注册（已禁用）
 
-系统已禁用用户自助注册接口。所有业主账号应由物业端或管理员通过受权限保护的接口创建。
+系统已禁用用户自助注册接口。所有业主账号应由物业端通过受权限保护的接口创建。
 
-如需创建业主账号，请使用 `POST /owners`（见业主管理节）由拥有 `property` 或 `admin` 角色的账号发起。
+如需创建业主账号，请使用 `POST /owners`（见业主管理节）由拥有 `property` 角色的账号发起。
 
 ### 2. 更新用户信息
 
@@ -217,7 +220,7 @@ Content-Type: application/json
 
 ```http
 POST /owners
-Authorization: Bearer {token}  // 需要 property 或 admin 角色
+Authorization: Bearer {token}  // 需要 property 角色
 Content-Type: application/json
 ```
 
