@@ -216,6 +216,29 @@ Content-Type: application/json
 }
 ```
 
+### 2.2 删除业主账号（物业端）
+
+```http
+DELETE /owners/{id}
+Authorization: Bearer {token}
+```
+
+说明：
+- 该接口仅允许具有 `property` 角色的账号调用。
+- 删除操作为软删除：将 `Owner.status` 以及关联 `User.status` 设为 `0`（禁用）。
+- 删除后业主将无法登录或使用系统功能，但历史记录（报修、账单、评论等）会被保留以便审计。
+
+成功响应示例：
+
+```json
+{
+  "code": 200,
+  "message": "业主账号已删除（已禁用）",
+  "data": null
+}
+```
+
+
 ### 2.1 创建业主账号（物业/管理员）
 
 ```http
