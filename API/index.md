@@ -389,13 +389,82 @@ Content-Type: application/json
 }
 ```
 
+
 ### 3. 上传头像
+
+说明：头像上传支持两种使用方式
+
+- 推荐方式（两步）：先调用 `POST /upload` 上传文件（`module=avatar`），成功后使用返回的 `file_url` 或 `file_id` 调用 `PUT /users/avatar` 或 `POST /users/avatar`（JSON 包含 `avatar_url`）来更新用户头像。
+- 便捷方式（一步）：直接将文件以 `multipart/form-data` POST 到 `POST /users/avatar`（字段名 `file`），后端会保存文件并自动更新当前用户的 `avatar_url`。
+
+注意：使用浏览器的 `fetch` 或 XHR 上传 `FormData` 时，不要手动设置 `Content-Type` 头，浏览器会自动设置包含 boundary 的 `Content-Type`。手动设置为 `application/json` 会导致服务器报 415 错误。
+
+示例：直接在 `users/avatar` 上传（一步）
 
 ```http
 POST /users/avatar
 Authorization: Bearer {token}
 Content-Type: multipart/form-data
 ```
+
+前端 JS（fetch + FormData）示例：
+
+```javascript
+const uploadAvatar = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  // 注意：不要手动设置 Content-Type，浏览器 会自动设置
+  const res = await fetch(`${API_BASE}/users/avatar`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    body: formData
+  });
+  return await res.json();
+}
+```
+
+示例：先上传到 `/upload`（两步），再更新头像
+
+```javascript
+const uploadFileThenSetAvatar = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('module', 'avatar');
+
+  // 上传文件
+  const uploadRes = await fetch(`${API_BASE}/upload`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    body: formData
+  });
+  const uploadJson = await uploadRes.json();
+  if (uploadJson.code !== 200) throw new Error(uploadJson.message);
+
+  // 假设后端返回 file_url 在 uploadJson.data.file_url
+  const avatarUrl = uploadJson.data.file_url;
+
+  // 更新用户头像（调用 JSON 接口）
+  const updateRes = await fetch(`${API_BASE}/users/avatar`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    body: JSON.stringify({ avatar_url: avatarUrl })
+  });
+  return await updateRes.json();
+}
+```
+
+常见错误与排查：
+- 错误：415 Unsupported Media Type — 原因：前端使用 `Content-Type: application/json` 上传文件或手动设置了 Content-Type。解决：使用 `FormData` 并让浏览器自动设置 Content-Type（不要手动设置）。
+- 错误：400 文件名为空 / 不支持的文件类型 — 请检查 `file` 字段是否存在以及文件后缀是否在允许范围（png/jpg/jpeg/gif）。
+
 
 ---
 
