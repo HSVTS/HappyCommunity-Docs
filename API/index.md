@@ -362,17 +362,26 @@ Content-Type: application/json
 }
 ```
 
-### 4. 发布/取消公告
+### 4. 公告发布说明与删除
+
+说明：项目已将“发布/取消公告”的单独接口移除，创建公告时将被直接发布（`is_published=1`，并设置 `published_at`）。如果需要临时保存草稿，请在后端添加相应字段或使用不同的管理流程。
+
+#### 删除公告（物业端）
 
 ```http
-PUT /announcements/{id}/publish
+DELETE /announcements/{id}
 Authorization: Bearer {token}
-Content-Type: application/json
 ```
+
+说明：该接口仅允许 `property` 角色调用。删除为物理删除，删除后公告将从系统中移除。
+
+成功响应示例：
 
 ```json
 {
-  "is_published": true
+  "code": 200,
+  "message": "公告已删除",
+  "data": null
 }
 ```
 
