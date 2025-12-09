@@ -500,6 +500,8 @@ Content-Type: application/json
 - `building`、`unit`、`room`、`community_name`、`owner_type` 这类地址/房间相关字段 **仅允许** 具有 `property` 或 `admin` 角色的账号修改（即物业端或管理员）。
 - 业主本人仅允许修改非受限字段，例如 `area`（面积）和 `move_in_date`（入住日期）。
 - 如果业主尝试修改受限字段，接口会返回 HTTP 403（权限不足）。
+ 
+ 另外：业主本人可以修改自己的 `real_name`（真实姓名）。请向 `PUT /owners/{id}` 发送 JSON 包含 `"real_name": "新的姓名"` 即可（前提是 `id` 对应的业主为当前登录用户）。物业端拥有修改任意业主 `real_name` 的权限。
 
 示例：物业端修改地址信息
 
