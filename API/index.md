@@ -92,6 +92,10 @@ Content-Type: application/json
 }
 ```
 
+说明：该接口通过请求中携带的 JWT token 确认当前登录账号（仅允许本人修改自己的密码）。
+- 请勿在请求体中传入 `user_id` 或尝试以 `user_id` 指定目标账号；如果需要物业或管理员修改其他账号的密码，请使用系统管理接口：`PUT /system/users/{id}/password`。
+- 若前端使用浏览器上传 FormData 或其它情况，请确保请求头与请求体格式正确（本接口为 JSON）。
+
 **默认物业账号**
 
 - 系统在首次创建数据库表时会自动创建一个默认的物业端账号：`phone=admin`，`password=admin`。
