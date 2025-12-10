@@ -501,16 +501,29 @@ Content-Type: application/json
 
 权限说明：
 
-- `building`、`unit`、`room`、`community_name`、`owner_type` 这类地址/房间相关字段 **仅允许** 具有 `property` 或 `admin` 角色的账号修改（即物业端或管理员）。
+- `building`、`unit`、`room`、`community_name`、`owner_type` 这类地址/房间相关字段 **仅允许** 具有 `property` 角色的账号修改（即物业端）。
 - 业主本人仅允许修改非受限字段，例如 `area`（面积）和 `move_in_date`（入住日期）。
+- **业主本人可修改自己的 `real_name`（真实姓名）**：系统通过请求中的 JWT token 判断是否为本人。向 `PUT /owners/{id}` 发送 JSON 包含 `"real_name": "新的姓名"` 即可。物业端可修改任意业主的 `real_name`。
 - 如果业主尝试修改受限字段，接口会返回 HTTP 403（权限不足）。
- 
- 另外：业主本人可以修改自己的 `real_name`（真实姓名）。请向 `PUT /owners/{id}` 发送 JSON 包含 `"real_name": "新的姓名"` 即可（前提是 `id` 对应的业主为当前登录用户）。物业端拥有修改任意业主 `real_name` 的权限。
 
-示例：物业端修改地址信息
+示例：业主本人修改自己的真实姓名
 
 ```http
-PUT /owners/123
+PUT /owners/5
+Authorization: Bearer {owner_token}
+Content-Type: application/json
+```
+
+```json
+{
+  "real_name": "张三"
+}
+```
+
+示例：物业端修改地址信息与姓名
+
+```http
+PUT /owners/5
 Authorization: Bearer {property_token}
 Content-Type: application/json
 ```
@@ -519,14 +532,15 @@ Content-Type: application/json
 {
   "building": "2",
   "unit": "1",
-  "room": "201"
+  "room": "201",
+  "real_name": "李四"
 }
 ```
 
 示例：业主修改非受限字段
 
 ```http
-PUT /owners/123
+PUT /owners/5
 Authorization: Bearer {owner_token}
 Content-Type: application/json
 ```
