@@ -886,12 +886,16 @@ Authorization: Bearer {token}
 Query: page=1&page_size=20&access_type=face&start_date=2024-01-01&end_date=2024-01-15
 ```
 
-### 2. 生成开门二维码
+### 2. 生成开门二维码令牌
 
 ```http
 POST /access/qrcode
 Authorization: Bearer {token}
 ```
+
+**说明**
+
+该接口仅允许业主调用。后端生成一个临时令牌（有效期 10 分钟），前端需要使用该令牌生成二维码图片。
 
 **响应数据**
 
@@ -900,10 +904,98 @@ Authorization: Bearer {token}
   "code": 200,
   "message": "success",
   "data": {
-    "qrcode_url": "/static/images/qrcode/abc123.jpg",
+    "token": "a1b2c3d4e5f6g7h8...",
     "expire_time": "2024-01-15T13:00:00Z"
   }
 }
+```
+
+**前端使用示例**（生成二维码）
+
+前端可以使用任何二维码库（例如 `qrcode.js`）来生成二维码：
+
+```javascript
+// 使用 qrcode.js 库
+import QRCode from 'qrcode';
+
+const generateQRCode = async () => {
+  try {
+    // 1. 调用后端接口获取令牌
+    const res = await fetch(`${API_BASE}/access/qrcode`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    const json = await res.json();
+    
+    if (json.code !== 200) throw new Error(json.message);
+    
+    const token = json.data.token;
+    
+    // 2. 使用令牌生成二维码（后端令牌格式：随机 hex 字符串，前端可直接使用或添加业务前缀）
+    const canvas = document.getElementById('qrcode-canvas');
+    await QRCode.toCanvas(canvas, token, {
+      errorCorrectionLevel: 'H',
+      type: 'image/png',
+      quality: 0.92,
+      margin: 1,
+      width: 200,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    });
+    
+    console.log('二维码生成成功，有效期至:', json.data.expire_time);
+  } catch (error) {
+    console.error('生成二维码失败:', error);
+  }
+};
+```
+
+**npm 安装依赖**
+
+```bash
+npm install qrcode
+```
+
+或者使用 HTML 中的 CDN：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode.js/1.5.3/qrcode.min.js"></script>
+```
+
+**CDN 方式示例**
+
+```javascript
+const generateQRCode = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/access/qrcode`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    const json = await res.json();
+    
+    if (json.code !== 200) throw new Error(json.message);
+    
+    const token = json.data.token;
+    
+    // 使用 QRCode 库生成二维码
+    const qrcode = new QRCode('qrcode-container', {
+      text: token,
+      width: 200,
+      height: 200,
+      colorDark: '#000000',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  } catch (error) {
+    console.error('生成二维码失败:', error);
+  }
+};
 ```
 
 ### 3. 访客授权管理
