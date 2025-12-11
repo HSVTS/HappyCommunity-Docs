@@ -1019,6 +1019,29 @@ Content-Type: application/json
 }
 ```
 
+**响应示例**
+
+```json
+{
+  "code": 200,
+  "message": "创建成功",
+  "data": {
+    "id": 5,
+    "owner_id": 1,
+    "visitor_name": "李四",
+    "visitor_phone": "13900139000",
+    "purpose": "拜访朋友",
+    "access_count": 2,
+    "used_count": 0,
+    "valid_from": "2024-01-15T09:00:00Z",
+    "valid_to": "2024-01-15T18:00:00Z",
+    "qrcode_data": "VISITOR:1:a1b2c3d4e5...",
+    "status": "active",
+    "created_at": "2024-01-15T08:00:00Z"
+  }
+}
+```
+
 #### 获取访客列表
 
 ```http
@@ -1027,12 +1050,101 @@ Authorization: Bearer {token}
 Query: page=1&page_size=10&status=active
 ```
 
+#### 获取访客授权令牌（用于生成二维码）
+
+```http
+POST /access/visitors/{visitor_id}/token
+Authorization: Bearer {token}
+```
+
+**说明**
+
+该接口允许业主为自己的访客授权生成临时令牌（有效期 10 分钟），物业可以为任何访客授权生成令牌。前端使用该令牌生成二维码供访客出入时扫描。
+
+**权限检查**
+
+- 业主只能为自己名下的访客授权生成令牌；
+- 物业可以为任何访客授权生成令牌；
+- 访客授权必须处于 `active` 状态且在有效期内，未达到使用次数限制。
+
+**响应数据**
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "token": "a1b2c3d4e5f6g7h8...",
+    "expire_time": "2024-01-15T13:00:00Z",
+    "visitor_info": {
+      "visitor_name": "李四",
+      "visitor_phone": "13900139000",
+      "purpose": "拜访朋友"
+    }
+  }
+}
+```
+
+**错误示例**
+
+如果访客授权已过期或已达使用限制：
+
+```json
+{
+  "code": 400,
+  "message": "访客授权已过期",
+  "data": null
+}
+```
+
+**前端使用示例**（生成访客二维码）
+
+```javascript
+const generateVisitorQRCode = async (visitorId) => {
+  try {
+    // 1. 调用后端接口获取访客授权令牌
+    const res = await fetch(`${API_BASE}/access/visitors/${visitorId}/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    const json = await res.json();
+    
+    if (json.code !== 200) throw new Error(json.message);
+    
+    const { token, visitor_info } = json.data;
+    
+    // 2. 使用令牌生成二维码
+    const canvas = document.getElementById('visitor-qrcode-canvas');
+    await QRCode.toCanvas(canvas, token, {
+      errorCorrectionLevel: 'H',
+      type: 'image/png',
+      quality: 0.92,
+      margin: 1,
+      width: 200
+    });
+    
+    // 3. 显示访客信息
+    document.getElementById('visitor-name').textContent = visitor_info.visitor_name;
+    document.getElementById('visitor-phone').textContent = visitor_info.visitor_phone;
+    document.getElementById('visitor-purpose').textContent = visitor_info.purpose;
+    
+    console.log('访客二维码生成成功');
+  } catch (error) {
+    console.error('生成访客二维码失败:', error);
+  }
+};
+```
+
 #### 取消访客授权
 
 ```http
 DELETE /access/visitors/{id}
 Authorization: Bearer {token}
 ```
+
+说明：业主可以取消自己的访客授权，物业可以取消任何访客授权。
 
 ### 4. 门禁统计（物业端）
 
